@@ -8,18 +8,19 @@ client = OpenAI(
     api_key=os.getenv("OPENROUTER_API_KEY"),  # Store API key in environment variable
 )
 
-
+#COMBINES CONTEXTS + CONSTRUCT PROMPT + CALL LLM
 def call_llm(query: str, contexts: List[str]) -> str:
     """
     OpenRouter API LLM call using google/gemini-2.5-flash model.
     Uses provided contexts to answer the question.
     """
-    
-    context_text = "\n\n".join(contexts)
-    
+
+#Combines contexts into single string
+    context_text = "\n\n".join(contexts) 
+
+#Construct prompt 
     prompt = f"""You are a helpful assistant.
 Use ONLY the context below to answer the question.
-
 Context:
 {context_text}
 
@@ -28,13 +29,10 @@ Question:
 
 Answer:"""
     
+#CALLS OPENROUTER MODEL   
     try:
         completion = client.chat.completions.create(
-            extra_headers={
-                "HTTP-Referer": os.getenv("SITE_URL", ""),  # Optional
-                "X-Title": os.getenv("SITE_NAME", ""),  # Optional
-            },
-            model="google/gemini-2.5-flash",
+            model="google/gemini-2.5-flash", 
             messages=[
                 {
                     "role": "user",

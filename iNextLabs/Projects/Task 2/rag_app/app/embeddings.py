@@ -15,10 +15,7 @@ client = OpenAI(
 )
 
 
-# -----------------------------
-# Text loading & chunking
-# -----------------------------
-
+#TEXT TO CHUNKS
 def load_and_chunk_text(file_path: str) -> List[str]:
     """
     Chunk website-style text using word-based chunking.
@@ -49,11 +46,7 @@ def load_and_chunk_text(file_path: str) -> List[str]:
 
     return chunks
 
-
-# -----------------------------
-# Embedding (API-based)
-# -----------------------------
-
+#CHUNKS TO VECTORS + NORMALISED
 def embed_texts(texts: List[str]) -> np.ndarray:
     """
     Embed a list of texts using OpenRouter's embedding API.
@@ -62,7 +55,7 @@ def embed_texts(texts: List[str]) -> np.ndarray:
     - Supports batch processing
     - Returns normalized embeddings compatible with FAISS
     """
-    
+
     if not texts:
         return np.array([])
     
@@ -82,6 +75,7 @@ def embed_texts(texts: List[str]) -> np.ndarray:
         embeddings_array = np.asarray(embeddings, dtype=np.float32)
         
         # Normalize embeddings for cosine similarity (FAISS compatibility)
+        # Value between 0 to 1 for better conclusions
         norms = np.linalg.norm(embeddings_array, axis=1, keepdims=True)
         normalized_embeddings = embeddings_array / norms
         
@@ -91,7 +85,7 @@ def embed_texts(texts: List[str]) -> np.ndarray:
         print(f"Error creating embeddings: {str(e)}")
         return np.array([])
 
-
+#Single Query Embedder (User)
 def embed_single_text(text: str) -> np.ndarray:
     """
     Embed a single text string.

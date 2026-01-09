@@ -20,7 +20,7 @@ class FaissStore:
     - Embed query text
     - Perform top-K similarity search
     """
-
+    #Loads FAISS index + METADATA
     def __init__(self, root_dir: Path):
         embeddings_dir = root_dir / "embeddings"
 
@@ -46,8 +46,9 @@ class FaissStore:
                 f"({self.index.ntotal} vs {len(self.chunks)})"
             )
 
+    #Similarity Search - Embedding User Query + FAISS Search
     def similarity_search(
-        self, query: str, k: int = 5
+        self, query: str, k: int = 3
     ) -> List[Tuple[str, float]]:
         """
         Perform similarity search against the FAISS index.
@@ -63,7 +64,7 @@ class FaissStore:
             return []
 
         # Embed query
-        query_emb = embed_texts([query])
+        query_emb = embed_texts([query]) #embeddings.py function call
         if not isinstance(query_emb, np.ndarray):
             raise RuntimeError("embed_texts must return a NumPy array")
         if query_emb.dtype != np.float32:
@@ -72,10 +73,11 @@ class FaissStore:
         # FAISS search
         distances, indices = self.index.search(query_emb, k)
 
-        results: List[Tuple[str, float]] = []
+        results: List[Tuple[str, float]] = [] #List of (chunk_text, distance) tuples
         for idx, dist in zip(indices[0], distances[0]):
             if idx < 0:
                 continue
             results.append((self.chunks[idx], float(dist)))
 
-        return results
+        return results #Top 5 Results 
+        
